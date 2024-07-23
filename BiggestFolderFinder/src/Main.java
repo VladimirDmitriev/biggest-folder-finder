@@ -1,21 +1,59 @@
 import java.io.File;
+import java.io.FilenameFilter;
+import java.util.Set;
 
 public class Main {
+    public static String ext = ".ext";
     public static void main(String[] args) {
-        String folderPath = "C:/Users/PC/Desktop/Executor";
-        File file = new File(folderPath);
-        System.out.println(getFolderSize(file));
+        Set keys = System.getProperties().keySet();
+        for (Object key : keys) {
+            System.out.println(key);
+        }
+        File folders = null;
+        //String folderPath = "C:/Users/PC/Desktop/Executor";
+        String userHome = System.getProperties().get("user.home").toString();
+        String folderPath = userHome + "\\Downloads";
+        System.out.println(folderPath);
+        try {
+            folders = new File(folderPath);
+        }catch (NullPointerException ex) {
+            System.out.println(ex.getMessage());
+        }
+        if(!folders.exists()) {
+            System.out.println(folderPath + " папка не существует");
+        }else{
+            System.out.println(getFolderSize(folders));
+        }
     }
 
-    public static long getFolderSize(File folder) {
-        if (folder.isFile()) {
-            return folder.length();
+    public static long getFolderSize(File folders) {
+        if (folders.isFile()) {
+            return folders.length();
+        } else {
+            File[] files = folders.listFiles();
+            long sum = 0;
+            for (File file : files) {
+                if (file.getName().toLowerCase().endsWith(".xlsx")) {
+                    sum += getFolderSize(file);
+                    System.out.println(file.getName());
+                }
+            }
+            return sum;
         }
-        long sum = 0;
-        File[] files = folder.listFiles();
-        for (File file: files) {
-            sum += getFolderSize(file);
+    }
+    private void outFileWithExtension(File dir) {
+        FilenameFilter txtFilter = new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+                if (dir.getName().endsWith(".txt")) {
+                    return true;
+                }else return false;
+            }
+        };
+        File[] files = dir.listFiles(txtFilter);
+        for (File file : files) {
+            System.out.println(file.getName());
         }
-        return sum;
     }
 }
+
