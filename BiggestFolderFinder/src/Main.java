@@ -3,7 +3,7 @@ import java.io.FilenameFilter;
 import java.util.Set;
 
 public class Main {
-    public static String ext = ".ext";
+    public static String ext = ".xlsx";
     public static void main(String[] args) {
         Set keys = System.getProperties().keySet();
         for (Object key : keys) {
@@ -33,7 +33,7 @@ public class Main {
             File[] files = folders.listFiles();
             long sum = 0;
             for (File file : files) {
-                if (file.getName().toLowerCase().endsWith(".xlsx")) {
+                if (file.getName().toLowerCase().endsWith(ext)) {
                     sum += getFolderSize(file);
                     System.out.println(file.getName());
                 }
@@ -42,13 +42,10 @@ public class Main {
         }
     }
     private void outFileWithExtension(File dir) {
-        FilenameFilter txtFilter = new FilenameFilter() {
-            @Override
-            public boolean accept(File dir, String name) {
-                if (dir.getName().endsWith(".txt")) {
-                    return true;
-                }else return false;
-            }
+        FilenameFilter txtFilter = (dir1, name) -> {
+            if (dir1.getName().endsWith(".txt")) {
+                return true;
+            }else return false;
         };
         File[] files = dir.listFiles(txtFilter);
         for (File file : files) {
