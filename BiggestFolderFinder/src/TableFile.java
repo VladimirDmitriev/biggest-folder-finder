@@ -8,11 +8,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class TableFile {
-    private static String path;
+//   private static String path;
     List<String> lines = new ArrayList<>();
     HashMap<String, Double> csvTable = new HashMap<>();
 
-    public HashMap getCsvTable(String path) {
+    public HashMap<String, Double> getCsvTable(String path) {
         {
             try {
                 lines = Files.readAllLines(Paths.get(path));
@@ -45,13 +45,12 @@ public class TableFile {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-            this.csvTable = csvTable;
         }
         return this.csvTable;
     }
 
     private static String getPaymentType(String info) {
-        String regex = "[^a-zA-Z0-9]([a-zA-Z0-9\s]+)[0-9]{2}\\.[0-9]{2}\\.[0-9]{2}\s[0-9]{2}\\.[0-9]{2}\\.[0-9]{2}";
+        String regex = "[^a-zA-Z0-9]([a-zA-Z0-9\\s]+)[0-9]{2}\\.[0-9]{2}\\.[0-9]{2}\\s[0-9]{2}\\.[0-9]{2}\\.[0-9]{2}";
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(info);
         return matcher.find() ? matcher.group(1).trim() : null;
