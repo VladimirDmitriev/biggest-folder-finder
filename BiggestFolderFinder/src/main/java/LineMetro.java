@@ -1,8 +1,14 @@
+import lombok.Getter;
+import lombok.Setter;
+
 public class LineMetro {
     public String numberLine;
     public String nameLine;
 
-    @Override
+    public LineMetro(String numberLine, String nameLine) {
+        this.numberLine = numberLine;
+        this.nameLine = nameLine;
+    }
     public String toString() {
         return "Line{" +
                 "numberLine=" + numberLine +
@@ -25,10 +31,4 @@ public class LineMetro {
     public String getNameLine() {
         return nameLine;
     }
-
-    public LineMetro(String numberLine, String nameLine) {
-        this.numberLine = numberLine;
-        this.nameLine = nameLine;
-    }
-
 }

@@ -1,14 +1,23 @@
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import dto.Car;
+import dto.Person;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.FilenameFilter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.List;
 
 
 public class Main {
-    public static int variant = 4;
+    public static int variant = 5;
     public static String ext = ".csv";
     private static final boolean OUT_CONSOLE = false;
 
@@ -48,31 +57,52 @@ public class Main {
             String path = "data/MoscowStation.html";
             String htmlFile = new ParseHtml().getParsePage(path);
             Document doc = Jsoup.parse(htmlFile);
-            String cssQueryLines = "span[^data-line],.name";
-            String cssQueryStation = "div.t-text-simple";
+//            String cssQueryLines = "span[^data-line],.name";
+//            String cssQueryStation = "div.t-text-simple";
             for (int i = 1; i <= 15; i++) {
-            Elements elements = doc.getElementsByAttributeValue("data-line",Integer.toString(i));
-            if (elements.isEmpty()) {continue;}
-            //System.out.println(elements.get(0).text());
-            //System.out.println(elements.get(0).attribute("data-line"));
-            String numberLine = elements.get(0).attribute("data-line").toString();
-            LineMetro lineMetro = new LineMetro(numberLine,elements.get(0).text());
-            System.out.print("\n");
-            System.out.println(lineMetro.getNameLine());
-            System.out.println("-------------------------");
-            //Elements stations  = elements.get(1).getElementsByTag("span");
-            Elements stations  = elements.get(1).getElementsByClass("name");
-            for (Element station : stations) {
+                Elements elements = doc.getElementsByAttributeValue("data-line", Integer.toString(i));
+                if (elements.isEmpty()) {
+                    continue;
+                }
+                //System.out.println(elements.get(0).text());
+                //System.out.println(elements.get(0).attribute("data-line"));
+                String numberLine = elements.get(0).attr("data-line").toString();
+                LineMetro lineMetro = new LineMetro(numberLine, elements.get(0).text());
+                System.out.print("\n");
+                System.out.println(lineMetro.getNameLine());
+                System.out.println("-------------------------");
+                //Elements stations  = elements.get(1).getElementsByTag("span");
+                Elements stations = elements.get(1).getElementsByClass("name");
+                for (Element station : stations) {
 //                System.out.println("tag:" + station.tag()+" className:" + station.className() +"  text:"+station.text());
-                Station newstation = new Station(station.text(),lineMetro);
-                System.out.println(newstation.getNameStation());
-                //System.out.println(line.children());
-//                for (Element child: line.select("name")) {
-//                    System.out.println(child.tagName());
-//                }
-
+                    Station newstation = new Station(station.text(), lineMetro);
+                    System.out.println(newstation.getNameStation());
+//                System.out.println(line.children());
+                    //                for (Element child: line.select("name")) {
+                    //                    System.out.println(child.tagName());
+                    //                }
+                }
             }
-
+        }else if(variant == 5) {
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.registerModule(new JavaTimeModule());
+            try {
+                String json = Files.readString(Paths.get("data/person.json"));
+                Person person = objectMapper.readValue(json, Person.class);
+                //Читаем созданный объект
+                System.out.println(person.getName());
+                System.out.println(person.getJob().getSince());
+                //модифицируем объекты
+                person.setChildren(List.of("Ольга","Петр"));
+                Car car = new Car();
+                car.setLicensePlate("A111BB777");
+                person.setCar(car);
+                String newJson = objectMapper.writeValueAsString(person);
+                FileWriter fileWriter = new FileWriter("data/personModified.json");
+                fileWriter.write(newJson);
+                fileWriter.close();
+            }catch (IOException e) {
+                System.out.println(e.getMessage());
             }
         }
     }
